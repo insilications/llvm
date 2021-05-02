@@ -26,8 +26,6 @@ gcc-libubsan
 gcc-locale
 gdb-dev
 git
-glibc-abi
-glibc-bench
 glibc-bin
 glibc-dev
 glibc-dev32
@@ -55,7 +53,6 @@ libxml2-dev
 libxslt
 mpc-dev
 mpfr-dev
-nasm
 ncurses
 ncurses-abi
 ncurses-bin
@@ -71,7 +68,6 @@ ncurses-man
 #ncurses-staticdev
 #ncurses-staticdev32
 ninja
-pkgconfig(zlib)
 procps-ng
 Pygments
 python3-dev
