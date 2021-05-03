@@ -46,8 +46,8 @@ cmake -G Ninja ../llvm \
     -DLLVM_REQUIRES_RTTI:BOOL=ON \
     -DLLVM_ENABLE_THREADS:BOOL=ON \
     -DLLVM_ENABLE_Z3_SOLVER:BOOL=ON \
-    -DLLVM_ENABLE_LIBEDIT:BOOL=ON \
-    -DLLVM_ENABLE_TERMINFO:BOOL=ON \
+    -DLLVM_ENABLE_LIBEDIT:BOOL=OFF \
+    -DLLVM_ENABLE_TERMINFO:BOOL=OFF \
     -DLLVM_ENABLE_ZLIB:BOOL=ON \
     -DLLVM_ENABLE_FFI:BOOL=ON \
     -DFFI_INCLUDE_DIR=`pkg-config --variable=includedir libffi` \
@@ -66,7 +66,7 @@ cmake -G Ninja ../llvm \
     -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3 \
     -DLLVM_ENABLE_PLUGINS:BOOL=ON \
     -DLLVM_EXPORT_SYMBOLS_FOR_PLUGINS:BOOL=ON \
-    -DLLVM_ENABLE_PROJECTS="llvm;clang;lld" \
+    -DLLVM_ENABLE_PROJECTS="llvm;clang;clang-tools-extra;lld" \
     -DCMAKE_CXX_STANDARD:STRING="14" \
     -DCMAKE_C_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -malign-data=cacheline -Wl,-sort-common -fdevirtualize-at-ltrans -flifetime-dse=1 -Wl,--as-needed -static-libgcc -static-libstdc++ -fPIC -pipe" \
     -DCMAKE_CXX_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -malign-data=cacheline -Wl,-sort-common -fdevirtualize-at-ltrans -flifetime-dse=1 -Wl,--as-needed -static-libgcc -static-libstdc++ -fPIC -pipe" \

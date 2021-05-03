@@ -1,0 +1,2 @@
+sd "/usr/lib64/libz3.so" "/usr/lib64/libz3.a" -r "*.ninja"
+sd "/usr/lib64/libz.so" "/usr/lib64/libz.a" -r "*.ninja"
