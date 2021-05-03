@@ -4,22 +4,23 @@
 #
 %define keepstatic 1
 Name     : llvm
-Version  : 12.0.0
+Version  : 12.0.1
 Release  : 131
-URL      : file:///insilications/apps/llvm-12.0.0.tar.gz
-Source0  : file:///insilications/apps/llvm-12.0.0.tar.gz
+URL      : file:///insilications/apps/llvm-12.0.1.tar.gz
+Source0  : file:///insilications/apps/llvm-12.0.1.tar.gz
 Summary  : Google microbenchmark framework
 Group    : Development/Tools
 License  : Apache-2.0 GPL-2.0
 Requires: llvm-bin = %{version}-%{release}
 Requires: llvm-data = %{version}-%{release}
 Requires: llvm-lib = %{version}-%{release}
+Requires: llvm-libexec = %{version}-%{release}
+Requires: llvm-man = %{version}-%{release}
 BuildRequires : PyYAML
 BuildRequires : Pygments
 BuildRequires : Sphinx
 BuildRequires : Vulkan-Headers-dev Vulkan-Loader-dev Vulkan-Tools
 BuildRequires : Z3-dev
-BuildRequires : Z3-staticdev
 BuildRequires : binutils-dev
 BuildRequires : binutils-extras
 BuildRequires : bison
@@ -47,8 +48,6 @@ BuildRequires : gcc-libubsan
 BuildRequires : gcc-locale
 BuildRequires : gdb-dev
 BuildRequires : git
-BuildRequires : glibc-abi
-BuildRequires : glibc-bench
 BuildRequires : glibc-bin
 BuildRequires : glibc-dev
 BuildRequires : glibc-dev32
@@ -68,17 +67,14 @@ BuildRequires : guile
 BuildRequires : libedit
 BuildRequires : libedit-dev
 BuildRequires : libffi-dev
-BuildRequires : libffi-staticdev
 BuildRequires : libgcc1
 BuildRequires : libstdc++
 BuildRequires : libunwind-dev
 BuildRequires : libxml2-dev
-BuildRequires : libxml2-staticdev
 BuildRequires : libxslt
 BuildRequires : lua-dev
 BuildRequires : mpc-dev
 BuildRequires : mpfr-dev
-BuildRequires : nasm
 BuildRequires : ncurses
 BuildRequires : ncurses-abi
 BuildRequires : ncurses-bin
@@ -89,9 +85,6 @@ BuildRequires : ncurses-lib
 BuildRequires : ncurses-lib-narrow
 BuildRequires : ncurses-lib-plusplus
 BuildRequires : ncurses-lib32
-BuildRequires : ncurses-man
-BuildRequires : ncurses-staticdev
-BuildRequires : ncurses-staticdev32
 BuildRequires : ninja
 BuildRequires : perl
 BuildRequires : pkg-config
@@ -111,11 +104,9 @@ BuildRequires : texinfo
 BuildRequires : util-linux
 BuildRequires : valgrind-dev
 BuildRequires : xz-dev
-BuildRequires : xz-staticdev
 BuildRequires : yaml
 BuildRequires : yaml-cpp
 BuildRequires : zlib-dev
-BuildRequires : zlib-staticdev
 # Suppress stripping binaries
 %define __strip /bin/true
 %define debug_package %{nil}
@@ -134,6 +125,7 @@ http://polly.llvm.org/
 Summary: bin components for the llvm package.
 Group: Binaries
 Requires: llvm-data = %{version}-%{release}
+Requires: llvm-libexec = %{version}-%{release}
 
 %description bin
 bin components for the llvm package.
@@ -164,9 +156,26 @@ dev components for the llvm package.
 Summary: lib components for the llvm package.
 Group: Libraries
 Requires: llvm-data = %{version}-%{release}
+Requires: llvm-libexec = %{version}-%{release}
 
 %description lib
 lib components for the llvm package.
+
+
+%package libexec
+Summary: libexec components for the llvm package.
+Group: Default
+
+%description libexec
+libexec components for the llvm package.
+
+
+%package man
+Summary: man components for the llvm package.
+Group: Default
+
+%description man
+man components for the llvm package.
 
 
 %package staticdev
@@ -179,8 +188,8 @@ staticdev components for the llvm package.
 
 
 %prep
-%setup -q -n llvm-12.0.0
-cd %{_builddir}/llvm-12.0.0
+%setup -q -n llvm-12.0.1
+cd %{_builddir}/llvm-12.0.1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -193,7 +202,7 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1619716929
+export SOURCE_DATE_EPOCH=1619996724
 unset LD_AS_NEEDED
 mkdir -p clr-build
 pushd clr-build
@@ -219,20 +228,13 @@ export AR=/usr/bin/gcc-ar
 export RANLIB=/usr/bin/gcc-ranlib
 export NM=/usr/bin/gcc-nm
 #  -Wl,--no-as-needed -pthread -lpthread --no-gc-sections -ffunction-sections -fdata-sections
-export CFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-z,max-page-size=0x1000 -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -fno-strict-aliasing -Wl,--no-as-needed -Wl,--whole-archive -pthread -lpthread -Wl,--no-whole-archive"
-export CXXFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-z,max-page-size=0x1000 -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -fno-strict-aliasing -Wl,--no-as-needed -Wl,--whole-archive -pthread -lpthread -Wl,--no-whole-archive"
-export LDFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-z,max-page-size=0x1000 -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -fno-strict-aliasing -Wl,--no-as-needed -Wl,--whole-archive -pthread -lpthread -Wl,--no-whole-archive"
-# -Wl,--no-as-needed -Wl,--whole-archive
+export CFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition"
+export CXXFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition"
+export LDFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition"
 ## altflags1 end
 # pushd ..
 # sd "flto=full" "flto=16" -r "*.cmake"
 # popd
-# -DLLVM_ENABLE_UNWIND_TABLES:BOOL=ON \
-# -DCLANG_DEFAULT_CXX_STDLIB:STRING=libstdc++ \
-# -DCLANG_DEFAULT_RTLIB:STRING=libgcc \
-# -DCLANG_DEFAULT_UNWINDLIB:STRING=libgcc \
-#     -DLLVM_ENABLE_FFI:BOOL=ON \
-# -DFFI_INCLUDE_DIR=`pkg-config --variable=includedir libffi` \
 cmake -G Ninja ../llvm \
     -DBUILD_SHARED_LIBS:BOOL=OFF \
     -DLIB_INSTALL_DIR=%{_libdir} \
@@ -251,16 +253,17 @@ cmake -G Ninja ../llvm \
     -DCMAKE_RANLIB=/usr/bin/gcc-ranlib \
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
     -DENABLE_LINKER_BUILD_ID:BOOL=ON \
-    -DLIBCLANG_BUILD_STATIC:BOOL=ON \
     -DCLANG_BUILD_TOOLS:BOOL=ON \
-    -DCLANG_DEFAULT_LINKER=bfd \
+    -DCLANG_DEFAULT_LINKER=lld \
     -DLLVM_ENABLE_LIBCXX:BOOL=OFF \
     -DLLVM_STATIC_LINK_CXX_STDLIB:BOOL=OFF \
-    -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=OFF \
+    -DCLANG_DEFAULT_CXX_STDLIB:STRING=libstdc++ \
+    -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON \
     -DCLANG_INCLUDE_TESTS:BOOL=OFF \
     -DCLANG_LINK_CLANG_DYLIB:BOOL=OFF \
     -DLLVM_LINK_LLVM_DYLIB:BOOL=OFF \
     -DLLVM_BUILD_LLVM_DYLIB:BOOL=ON \
+    -DLIBCLANG_BUILD_STATIC:BOOL=ON \
     -DCOMPILER_RT_BUILD_SANITIZERS:BOOL=OFF \
     -DCOMPILER_RT_BUILD_XRAY:BOOL=OFF \
     -DLLVM_BINUTILS_INCDIR=/usr/include \
@@ -268,26 +271,28 @@ cmake -G Ninja ../llvm \
     -DLLVM_BUILD_RUNTIME:BOOL=ON \
     -DLLVM_BUILD_TOOLS:BOOL=ON \
     -DLLVM_BUILD_UTILS:BOOL=ON \
-    -DLLVM_ENABLE_ASSERTIONS:BOOL=OFF \
+    -DLLVM_ENABLE_ASSERTIONS:BOOL=ON \
     -DLLVM_ENABLE_BINDINGS:BOOL=OFF \
     -DLLVM_ENABLE_DOXYGEN:BOOL=OFF \
-    -DLLVM_ENABLE_EH:BOOL=OFF \
+    -DLLVM_ENABLE_EH:BOOL=ON \
     -DLLVM_ENABLE_LIBXML2:BOOL=ON \
-    -DLLVM_ENABLE_PIC=ON \
     -DLLVM_ENABLE_RTTI:BOOL=ON \
     -DLLVM_REQUIRES_RTTI:BOOL=ON \
     -DLLVM_ENABLE_THREADS:BOOL=ON \
-    -DLLVM_ENABLE_Z3_SOLVER:BOOL=OFF \
-    -DLLVM_ENABLE_LIBEDIT:BOOL=OFF \
-    -DLLVM_ENABLE_TERMINFO:BOOL=OFF \
+    -DLLVM_ENABLE_Z3_SOLVER:BOOL=ON \
+    -DLLVM_ENABLE_LIBEDIT:BOOL=ON \
+    -DLLVM_ENABLE_TERMINFO:BOOL=ON \
     -DLLVM_ENABLE_ZLIB:BOOL=ON \
+    -DLLVM_ENABLE_FFI:BOOL=ON \
+    -DFFI_INCLUDE_DIR=`pkg-config --variable=includedir libffi` \
     -DCLANG_ENABLE_ARCMT:BOOL=OFF \
     -DLLVM_INCLUDE_TESTS:BOOL=OFF \
     -DLLVM_INCLUDE_TOOLS:BOOL=ON \
     -DLLVM_INSTALL_UTILS:BOOL=ON \
     -DCMAKE_DISABLE_FIND_PACKAGE_CUDA:BOOL=ON \
     -DLLVM_OPTIMIZED_TABLEGEN:BOOL=ON \
-    -DLLVM_TARGETS_TO_BUILD="Native" \
+    -DLLVM_ENABLE_PIC=ON \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_TOOL_CLANG_TOOLS_EXTRA_BUILD:BOOL=ON \
     -DLLVM_TOOL_COMPILER_RT_BUILD:BOOL=OFF \
     -DLLVM_USE_LINKER:STRING=bfd \
@@ -295,23 +300,23 @@ cmake -G Ninja ../llvm \
     -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3 \
     -DLLVM_ENABLE_PLUGINS:BOOL=ON \
     -DLLVM_EXPORT_SYMBOLS_FOR_PLUGINS:BOOL=ON \
-    -DLLVM_ENABLE_PROJECTS="clang" \
+    -DLLVM_ENABLE_PROJECTS="llvm;clang;clang-tools-extra;lld" \
     -DCMAKE_CXX_STANDARD:STRING="14" \
-    -DCMAKE_C_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-z,max-page-size=0x1000 -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -fno-strict-aliasing -Wl,--no-as-needed -Wl,--whole-archive -pthread -lpthread -Wl,--no-whole-archive" \
-    -DCMAKE_CXX_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-z,max-page-size=0x1000 -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -fno-strict-aliasing -Wl,--no-as-needed -Wl,--whole-archive -pthread -lpthread -Wl,--no-whole-archive" \
-    -DCMAKE_EXE_LINKER_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-z,max-page-size=0x1000 -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -fno-strict-aliasing -Wl,--no-as-needed -Wl,--whole-archive -pthread -lpthread -Wl,--no-whole-archive" \
-    -DCMAKE_MODULE_LINKER_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-z,max-page-size=0x1000 -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -fno-strict-aliasing -Wl,--no-as-needed -Wl,--whole-archive -pthread -lpthread -Wl,--no-whole-archive" \
-    -DCMAKE_SHARED_LINKER_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-z,max-page-size=0x1000 -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -fno-strict-aliasing -Wl,--no-as-needed -Wl,--whole-archive -pthread -lpthread -Wl,--no-whole-archive" \
+    -DCMAKE_C_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition" \
+    -DCMAKE_CXX_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition" \
+    -DCMAKE_EXE_LINKER_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition" \
+    -DCMAKE_MODULE_LINKER_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition" \
+    -DCMAKE_SHARED_LINKER_FLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition" \
     -DGCC_INSTALL_PREFIX="/usr" \
     -Wno-dev
-cmake --build .
+ninja --verbose -j16
 ## ccache stats
 ccache -s
 ## ccache stats
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1619716929
+export SOURCE_DATE_EPOCH=1619996724
 rm -rf %{buildroot}
 pushd clr-build
 %ninja_install
@@ -362,34 +367,68 @@ popd
 /usr/bin/clang++
 /usr/bin/clang++-12
 /usr/bin/clang-12
+/usr/bin/clang-apply-replacements
+/usr/bin/clang-apply-replacements-12
+/usr/bin/clang-change-namespace
+/usr/bin/clang-change-namespace-12
+/usr/bin/clang-check
+/usr/bin/clang-check-12
 /usr/bin/clang-cl
 /usr/bin/clang-cl-12
 /usr/bin/clang-cpp
 /usr/bin/clang-cpp-12
+/usr/bin/clang-doc
+/usr/bin/clang-doc-12
+/usr/bin/clang-extdef-mapping
+/usr/bin/clang-extdef-mapping-12
 /usr/bin/clang-format
 /usr/bin/clang-format-12
+/usr/bin/clang-include-fixer
+/usr/bin/clang-include-fixer-12
+/usr/bin/clang-move
+/usr/bin/clang-move-12
 /usr/bin/clang-offload-bundler
 /usr/bin/clang-offload-bundler-12
 /usr/bin/clang-offload-wrapper
 /usr/bin/clang-offload-wrapper-12
+/usr/bin/clang-query
+/usr/bin/clang-query-12
 /usr/bin/clang-refactor
 /usr/bin/clang-refactor-12
 /usr/bin/clang-rename
 /usr/bin/clang-rename-12
+/usr/bin/clang-reorder-fields
+/usr/bin/clang-reorder-fields-12
 /usr/bin/clang-scan-deps
 /usr/bin/clang-scan-deps-12
+/usr/bin/clang-tidy
+/usr/bin/clang-tidy-12
+/usr/bin/clangd
+/usr/bin/clangd-12
 /usr/bin/count
 /usr/bin/count-12
 /usr/bin/diagtool
 /usr/bin/diagtool-12
 /usr/bin/dsymutil
 /usr/bin/dsymutil-12
+/usr/bin/find-all-symbols
+/usr/bin/find-all-symbols-12
 /usr/bin/git-clang-format
 /usr/bin/git-clang-format-12
 /usr/bin/hmaptool
 /usr/bin/hmaptool-12
+/usr/bin/ld.lld
+/usr/bin/ld.lld-12
+/usr/bin/ld64.lld
+/usr/bin/ld64.lld-12
+/usr/bin/ld64.lld.darwinnew
+/usr/bin/ld64.lld.darwinnew-12
 /usr/bin/llc
 /usr/bin/llc-12
+/usr/bin/lld
+/usr/bin/lld-12
+/usr/bin/lld-link
+/usr/bin/lld-link-12
 /usr/bin/lli
 /usr/bin/lli-12
 /usr/bin/lli-child-target
@@ -516,20 +555,30 @@ popd
 /usr/bin/llvm-undname-12
 /usr/bin/llvm-xray
 /usr/bin/llvm-xray-12
+/usr/bin/modularize
+/usr/bin/modularize-12
 /usr/bin/not
 /usr/bin/not-12
 /usr/bin/obj2yaml
 /usr/bin/obj2yaml-12
 /usr/bin/opt
 /usr/bin/opt-12
+/usr/bin/pp-trace
+/usr/bin/pp-trace-12
 /usr/bin/sancov
 /usr/bin/sancov-12
 /usr/bin/sanstats
 /usr/bin/sanstats-12
+/usr/bin/scan-build
+/usr/bin/scan-build-12
+/usr/bin/scan-view
+/usr/bin/scan-view-12
 /usr/bin/split-file
 /usr/bin/split-file-12
 /usr/bin/verify-uselistorder
 /usr/bin/verify-uselistorder-12
+/usr/bin/wasm-ld
+/usr/bin/wasm-ld-12
 /usr/bin/yaml-bench
 /usr/bin/yaml-bench-12
 /usr/bin/yaml2obj
@@ -538,19 +587,31 @@ popd
 %files data
 %defattr(-,root,root,-)
 /usr/share/clang/bash-autocomplete.sh
+/usr/share/clang/clang-doc-default-stylesheet.css
 /usr/share/clang/clang-format-bbedit.applescript
 /usr/share/clang/clang-format-diff.py
 /usr/share/clang/clang-format-sublime.py
 /usr/share/clang/clang-format.el
 /usr/share/clang/clang-format.py
+/usr/share/clang/clang-include-fixer.el
+/usr/share/clang/clang-include-fixer.py
 /usr/share/clang/clang-rename.el
 /usr/share/clang/clang-rename.py
+/usr/share/clang/clang-tidy-diff.py
+/usr/share/clang/index.js
+/usr/share/clang/run-clang-tidy.py
+/usr/share/clang/run-find-all-symbols.py
 /usr/share/opt-viewer/opt-diff.py
 /usr/share/opt-viewer/opt-stats.py
 /usr/share/opt-viewer/opt-viewer.py
 /usr/share/opt-viewer/optpmap.py
 /usr/share/opt-viewer/optrecord.py
 /usr/share/opt-viewer/style.css
+/usr/share/scan-build/scanview.css
+/usr/share/scan-build/sorttable.js
+/usr/share/scan-view/ScanView.py
+/usr/share/scan-view/bugcatcher.ico
+/usr/share/scan-view/startfile.py
 
 %files dev
 %defattr(-,root,root,-)
@@ -564,6 +625,318 @@ popd
 /usr/include/clang-c/Index.h
 /usr/include/clang-c/Platform.h
 /usr/include/clang-c/Rewrite.h
+/usr/include/clang-tidy/ClangTidy.h
+/usr/include/clang-tidy/ClangTidyCheck.h
+/usr/include/clang-tidy/ClangTidyDiagnosticConsumer.h
+/usr/include/clang-tidy/ClangTidyForceLinker.h
+/usr/include/clang-tidy/ClangTidyModule.h
+/usr/include/clang-tidy/ClangTidyModuleRegistry.h
+/usr/include/clang-tidy/ClangTidyOptions.h
+/usr/include/clang-tidy/ClangTidyProfiling.h
+/usr/include/clang-tidy/ExpandModularHeadersPPCallbacks.h
+/usr/include/clang-tidy/GlobList.h
+/usr/include/clang-tidy/abseil/AbseilMatcher.h
+/usr/include/clang-tidy/abseil/DurationAdditionCheck.h
+/usr/include/clang-tidy/abseil/DurationComparisonCheck.h
+/usr/include/clang-tidy/abseil/DurationConversionCastCheck.h
+/usr/include/clang-tidy/abseil/DurationDivisionCheck.h
+/usr/include/clang-tidy/abseil/DurationFactoryFloatCheck.h
+/usr/include/clang-tidy/abseil/DurationFactoryScaleCheck.h
+/usr/include/clang-tidy/abseil/DurationRewriter.h
+/usr/include/clang-tidy/abseil/DurationSubtractionCheck.h
+/usr/include/clang-tidy/abseil/DurationUnnecessaryConversionCheck.h
+/usr/include/clang-tidy/abseil/FasterStrsplitDelimiterCheck.h
+/usr/include/clang-tidy/abseil/NoInternalDependenciesCheck.h
+/usr/include/clang-tidy/abseil/NoNamespaceCheck.h
+/usr/include/clang-tidy/abseil/RedundantStrcatCallsCheck.h
+/usr/include/clang-tidy/abseil/StrCatAppendCheck.h
+/usr/include/clang-tidy/abseil/StringFindStartswithCheck.h
+/usr/include/clang-tidy/abseil/StringFindStrContainsCheck.h
+/usr/include/clang-tidy/abseil/TimeComparisonCheck.h
+/usr/include/clang-tidy/abseil/TimeSubtractionCheck.h
+/usr/include/clang-tidy/abseil/UpgradeDurationConversionsCheck.h
+/usr/include/clang-tidy/altera/KernelNameRestrictionCheck.h
+/usr/include/clang-tidy/altera/SingleWorkItemBarrierCheck.h
+/usr/include/clang-tidy/altera/StructPackAlignCheck.h
+/usr/include/clang-tidy/android/CloexecAccept4Check.h
+/usr/include/clang-tidy/android/CloexecAcceptCheck.h
+/usr/include/clang-tidy/android/CloexecCheck.h
+/usr/include/clang-tidy/android/CloexecCreatCheck.h
+/usr/include/clang-tidy/android/CloexecDupCheck.h
+/usr/include/clang-tidy/android/CloexecEpollCreate1Check.h
+/usr/include/clang-tidy/android/CloexecEpollCreateCheck.h
+/usr/include/clang-tidy/android/CloexecFopenCheck.h
+/usr/include/clang-tidy/android/CloexecInotifyInit1Check.h
+/usr/include/clang-tidy/android/CloexecInotifyInitCheck.h
+/usr/include/clang-tidy/android/CloexecMemfdCreateCheck.h
+/usr/include/clang-tidy/android/CloexecOpenCheck.h
+/usr/include/clang-tidy/android/CloexecPipe2Check.h
+/usr/include/clang-tidy/android/CloexecPipeCheck.h
+/usr/include/clang-tidy/android/CloexecSocketCheck.h
+/usr/include/clang-tidy/android/ComparisonInTempFailureRetryCheck.h
+/usr/include/clang-tidy/boost/UseToStringCheck.h
+/usr/include/clang-tidy/bugprone/ArgumentCommentCheck.h
+/usr/include/clang-tidy/bugprone/AssertSideEffectCheck.h
+/usr/include/clang-tidy/bugprone/BadSignalToKillThreadCheck.h
+/usr/include/clang-tidy/bugprone/BoolPointerImplicitConversionCheck.h
+/usr/include/clang-tidy/bugprone/BranchCloneCheck.h
+/usr/include/clang-tidy/bugprone/CopyConstructorInitCheck.h
+/usr/include/clang-tidy/bugprone/DanglingHandleCheck.h
+/usr/include/clang-tidy/bugprone/DynamicStaticInitializersCheck.h
+/usr/include/clang-tidy/bugprone/ExceptionEscapeCheck.h
+/usr/include/clang-tidy/bugprone/FoldInitTypeCheck.h
+/usr/include/clang-tidy/bugprone/ForwardDeclarationNamespaceCheck.h
+/usr/include/clang-tidy/bugprone/ForwardingReferenceOverloadCheck.h
+/usr/include/clang-tidy/bugprone/InaccurateEraseCheck.h
+/usr/include/clang-tidy/bugprone/IncorrectRoundingsCheck.h
+/usr/include/clang-tidy/bugprone/InfiniteLoopCheck.h
+/usr/include/clang-tidy/bugprone/IntegerDivisionCheck.h
+/usr/include/clang-tidy/bugprone/LambdaFunctionNameCheck.h
+/usr/include/clang-tidy/bugprone/MacroParenthesesCheck.h
+/usr/include/clang-tidy/bugprone/MacroRepeatedSideEffectsCheck.h
+/usr/include/clang-tidy/bugprone/MisplacedOperatorInStrlenInAllocCheck.h
+/usr/include/clang-tidy/bugprone/MisplacedPointerArithmeticInAllocCheck.h
+/usr/include/clang-tidy/bugprone/MisplacedWideningCastCheck.h
+/usr/include/clang-tidy/bugprone/MoveForwardingReferenceCheck.h
+/usr/include/clang-tidy/bugprone/MultipleStatementMacroCheck.h
+/usr/include/clang-tidy/bugprone/NoEscapeCheck.h
+/usr/include/clang-tidy/bugprone/NotNullTerminatedResultCheck.h
+/usr/include/clang-tidy/bugprone/ParentVirtualCallCheck.h
+/usr/include/clang-tidy/bugprone/PosixReturnCheck.h
+/usr/include/clang-tidy/bugprone/RedundantBranchConditionCheck.h
+/usr/include/clang-tidy/bugprone/ReservedIdentifierCheck.h
+/usr/include/clang-tidy/bugprone/SignalHandlerCheck.h
+/usr/include/clang-tidy/bugprone/SignedCharMisuseCheck.h
+/usr/include/clang-tidy/bugprone/SizeofContainerCheck.h
+/usr/include/clang-tidy/bugprone/SizeofExpressionCheck.h
+/usr/include/clang-tidy/bugprone/SpuriouslyWakeUpFunctionsCheck.h
+/usr/include/clang-tidy/bugprone/StringConstructorCheck.h
+/usr/include/clang-tidy/bugprone/StringIntegerAssignmentCheck.h
+/usr/include/clang-tidy/bugprone/StringLiteralWithEmbeddedNulCheck.h
+/usr/include/clang-tidy/bugprone/SuspiciousEnumUsageCheck.h
+/usr/include/clang-tidy/bugprone/SuspiciousIncludeCheck.h
+/usr/include/clang-tidy/bugprone/SuspiciousMemsetUsageCheck.h
+/usr/include/clang-tidy/bugprone/SuspiciousMissingCommaCheck.h
+/usr/include/clang-tidy/bugprone/SuspiciousSemicolonCheck.h
+/usr/include/clang-tidy/bugprone/SuspiciousStringCompareCheck.h
+/usr/include/clang-tidy/bugprone/SwappedArgumentsCheck.h
+/usr/include/clang-tidy/bugprone/TerminatingContinueCheck.h
+/usr/include/clang-tidy/bugprone/ThrowKeywordMissingCheck.h
+/usr/include/clang-tidy/bugprone/TooSmallLoopVariableCheck.h
+/usr/include/clang-tidy/bugprone/UndefinedMemoryManipulationCheck.h
+/usr/include/clang-tidy/bugprone/UndelegatedConstructorCheck.h
+/usr/include/clang-tidy/bugprone/UnhandledSelfAssignmentCheck.h
+/usr/include/clang-tidy/bugprone/UnusedRaiiCheck.h
+/usr/include/clang-tidy/bugprone/UnusedReturnValueCheck.h
+/usr/include/clang-tidy/bugprone/UseAfterMoveCheck.h
+/usr/include/clang-tidy/bugprone/VirtualNearMissCheck.h
+/usr/include/clang-tidy/cert/CommandProcessorCheck.h
+/usr/include/clang-tidy/cert/DefaultOperatorNewAlignmentCheck.h
+/usr/include/clang-tidy/cert/DontModifyStdNamespaceCheck.h
+/usr/include/clang-tidy/cert/FloatLoopCounter.h
+/usr/include/clang-tidy/cert/LimitedRandomnessCheck.h
+/usr/include/clang-tidy/cert/MutatingCopyCheck.h
+/usr/include/clang-tidy/cert/NonTrivialTypesLibcMemoryCallsCheck.h
+/usr/include/clang-tidy/cert/PostfixOperatorCheck.h
+/usr/include/clang-tidy/cert/ProperlySeededRandomGeneratorCheck.h
+/usr/include/clang-tidy/cert/SetLongJmpCheck.h
+/usr/include/clang-tidy/cert/StaticObjectExceptionCheck.h
+/usr/include/clang-tidy/cert/StrToNumCheck.h
+/usr/include/clang-tidy/cert/ThrownExceptionTypeCheck.h
+/usr/include/clang-tidy/cert/VariadicFunctionDefCheck.h
+/usr/include/clang-tidy/concurrency/MtUnsafeCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/AvoidGotoCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/AvoidNonConstGlobalVariablesCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/InitVariablesCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/InterfacesGlobalInitCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/MacroUsageCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/NarrowingConversionsCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/NoMallocCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/OwningMemoryCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProBoundsArrayToPointerDecayCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProBoundsConstantArrayIndexCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProBoundsPointerArithmeticCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProTypeConstCastCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProTypeCstyleCastCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProTypeMemberInitCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProTypeReinterpretCastCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProTypeStaticCastDowncastCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProTypeUnionAccessCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/ProTypeVarargCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/SlicingCheck.h
+/usr/include/clang-tidy/cppcoreguidelines/SpecialMemberFunctionsCheck.h
+/usr/include/clang-tidy/darwin/AvoidSpinlockCheck.h
+/usr/include/clang-tidy/darwin/DispatchOnceNonstaticCheck.h
+/usr/include/clang-tidy/fuchsia/DefaultArgumentsCallsCheck.h
+/usr/include/clang-tidy/fuchsia/DefaultArgumentsDeclarationsCheck.h
+/usr/include/clang-tidy/fuchsia/MultipleInheritanceCheck.h
+/usr/include/clang-tidy/fuchsia/OverloadedOperatorCheck.h
+/usr/include/clang-tidy/fuchsia/StaticallyConstructedObjectsCheck.h
+/usr/include/clang-tidy/fuchsia/TrailingReturnCheck.h
+/usr/include/clang-tidy/fuchsia/VirtualInheritanceCheck.h
+/usr/include/clang-tidy/google/AvoidCStyleCastsCheck.h
+/usr/include/clang-tidy/google/AvoidNSObjectNewCheck.h
+/usr/include/clang-tidy/google/AvoidThrowingObjCExceptionCheck.h
+/usr/include/clang-tidy/google/AvoidUnderscoreInGoogletestNameCheck.h
+/usr/include/clang-tidy/google/DefaultArgumentsCheck.h
+/usr/include/clang-tidy/google/ExplicitConstructorCheck.h
+/usr/include/clang-tidy/google/ExplicitMakePairCheck.h
+/usr/include/clang-tidy/google/FunctionNamingCheck.h
+/usr/include/clang-tidy/google/GlobalNamesInHeadersCheck.h
+/usr/include/clang-tidy/google/GlobalVariableDeclarationCheck.h
+/usr/include/clang-tidy/google/IntegerTypesCheck.h
+/usr/include/clang-tidy/google/OverloadedUnaryAndCheck.h
+/usr/include/clang-tidy/google/TodoCommentCheck.h
+/usr/include/clang-tidy/google/UnnamedNamespaceInHeaderCheck.h
+/usr/include/clang-tidy/google/UpgradeGoogletestCaseCheck.h
+/usr/include/clang-tidy/google/UsingNamespaceDirectiveCheck.h
+/usr/include/clang-tidy/hicpp/ExceptionBaseclassCheck.h
+/usr/include/clang-tidy/hicpp/MultiwayPathsCoveredCheck.h
+/usr/include/clang-tidy/hicpp/NoAssemblerCheck.h
+/usr/include/clang-tidy/hicpp/SignedBitwiseCheck.h
+/usr/include/clang-tidy/linuxkernel/MustCheckErrsCheck.h
+/usr/include/clang-tidy/llvm/HeaderGuardCheck.h
+/usr/include/clang-tidy/llvm/IncludeOrderCheck.h
+/usr/include/clang-tidy/llvm/PreferIsaOrDynCastInConditionalsCheck.h
+/usr/include/clang-tidy/llvm/PreferRegisterOverUnsignedCheck.h
+/usr/include/clang-tidy/llvm/TwineLocalCheck.h
+/usr/include/clang-tidy/llvmlibc/CalleeNamespaceCheck.h
+/usr/include/clang-tidy/llvmlibc/ImplementationInNamespaceCheck.h
+/usr/include/clang-tidy/llvmlibc/RestrictSystemLibcHeadersCheck.h
+/usr/include/clang-tidy/misc/DefinitionsInHeadersCheck.h
+/usr/include/clang-tidy/misc/MisplacedConstCheck.h
+/usr/include/clang-tidy/misc/NewDeleteOverloadsCheck.h
+/usr/include/clang-tidy/misc/NoRecursionCheck.h
+/usr/include/clang-tidy/misc/NonCopyableObjects.h
+/usr/include/clang-tidy/misc/NonPrivateMemberVariablesInClassesCheck.h
+/usr/include/clang-tidy/misc/RedundantExpressionCheck.h
+/usr/include/clang-tidy/misc/StaticAssertCheck.h
+/usr/include/clang-tidy/misc/ThrowByValueCatchByReferenceCheck.h
+/usr/include/clang-tidy/misc/UnconventionalAssignOperatorCheck.h
+/usr/include/clang-tidy/misc/UniqueptrResetReleaseCheck.h
+/usr/include/clang-tidy/misc/UnusedAliasDeclsCheck.h
+/usr/include/clang-tidy/misc/UnusedParametersCheck.h
+/usr/include/clang-tidy/misc/UnusedUsingDeclsCheck.h
+/usr/include/clang-tidy/modernize/AvoidBindCheck.h
+/usr/include/clang-tidy/modernize/AvoidCArraysCheck.h
+/usr/include/clang-tidy/modernize/ConcatNestedNamespacesCheck.h
+/usr/include/clang-tidy/modernize/DeprecatedHeadersCheck.h
+/usr/include/clang-tidy/modernize/DeprecatedIosBaseAliasesCheck.h
+/usr/include/clang-tidy/modernize/LoopConvertCheck.h
+/usr/include/clang-tidy/modernize/LoopConvertUtils.h
+/usr/include/clang-tidy/modernize/MakeSharedCheck.h
+/usr/include/clang-tidy/modernize/MakeSmartPtrCheck.h
+/usr/include/clang-tidy/modernize/MakeUniqueCheck.h
+/usr/include/clang-tidy/modernize/PassByValueCheck.h
+/usr/include/clang-tidy/modernize/RawStringLiteralCheck.h
+/usr/include/clang-tidy/modernize/RedundantVoidArgCheck.h
+/usr/include/clang-tidy/modernize/ReplaceAutoPtrCheck.h
+/usr/include/clang-tidy/modernize/ReplaceDisallowCopyAndAssignMacroCheck.h
+/usr/include/clang-tidy/modernize/ReplaceRandomShuffleCheck.h
+/usr/include/clang-tidy/modernize/ReturnBracedInitListCheck.h
+/usr/include/clang-tidy/modernize/ShrinkToFitCheck.h
+/usr/include/clang-tidy/modernize/UnaryStaticAssertCheck.h
+/usr/include/clang-tidy/modernize/UseAutoCheck.h
+/usr/include/clang-tidy/modernize/UseBoolLiteralsCheck.h
+/usr/include/clang-tidy/modernize/UseDefaultMemberInitCheck.h
+/usr/include/clang-tidy/modernize/UseEmplaceCheck.h
+/usr/include/clang-tidy/modernize/UseEqualsDefaultCheck.h
+/usr/include/clang-tidy/modernize/UseEqualsDeleteCheck.h
+/usr/include/clang-tidy/modernize/UseNodiscardCheck.h
+/usr/include/clang-tidy/modernize/UseNoexceptCheck.h
+/usr/include/clang-tidy/modernize/UseNullptrCheck.h
+/usr/include/clang-tidy/modernize/UseOverrideCheck.h
+/usr/include/clang-tidy/modernize/UseTrailingReturnTypeCheck.h
+/usr/include/clang-tidy/modernize/UseTransparentFunctorsCheck.h
+/usr/include/clang-tidy/modernize/UseUncaughtExceptionsCheck.h
+/usr/include/clang-tidy/modernize/UseUsingCheck.h
+/usr/include/clang-tidy/mpi/BufferDerefCheck.h
+/usr/include/clang-tidy/mpi/TypeMismatchCheck.h
+/usr/include/clang-tidy/objc/AvoidNSErrorInitCheck.h
+/usr/include/clang-tidy/objc/DeallocInCategoryCheck.h
+/usr/include/clang-tidy/objc/ForbiddenSubclassingCheck.h
+/usr/include/clang-tidy/objc/MissingHashCheck.h
+/usr/include/clang-tidy/objc/NSInvocationArgumentLifetimeCheck.h
+/usr/include/clang-tidy/objc/PropertyDeclarationCheck.h
+/usr/include/clang-tidy/objc/SuperSelfCheck.h
+/usr/include/clang-tidy/openmp/ExceptionEscapeCheck.h
+/usr/include/clang-tidy/openmp/UseDefaultNoneCheck.h
+/usr/include/clang-tidy/performance/FasterStringFindCheck.h
+/usr/include/clang-tidy/performance/ForRangeCopyCheck.h
+/usr/include/clang-tidy/performance/ImplicitConversionInLoopCheck.h
+/usr/include/clang-tidy/performance/InefficientAlgorithmCheck.h
+/usr/include/clang-tidy/performance/InefficientStringConcatenationCheck.h
+/usr/include/clang-tidy/performance/InefficientVectorOperationCheck.h
+/usr/include/clang-tidy/performance/MoveConstArgCheck.h
+/usr/include/clang-tidy/performance/MoveConstructorInitCheck.h
+/usr/include/clang-tidy/performance/NoAutomaticMoveCheck.h
+/usr/include/clang-tidy/performance/NoIntToPtrCheck.h
+/usr/include/clang-tidy/performance/NoexceptMoveConstructorCheck.h
+/usr/include/clang-tidy/performance/TriviallyDestructibleCheck.h
+/usr/include/clang-tidy/performance/TypePromotionInMathFnCheck.h
+/usr/include/clang-tidy/performance/UnnecessaryCopyInitialization.h
+/usr/include/clang-tidy/performance/UnnecessaryValueParamCheck.h
+/usr/include/clang-tidy/portability/RestrictSystemIncludesCheck.h
+/usr/include/clang-tidy/portability/SIMDIntrinsicsCheck.h
+/usr/include/clang-tidy/readability/AvoidConstParamsInDecls.h
+/usr/include/clang-tidy/readability/BracesAroundStatementsCheck.h
+/usr/include/clang-tidy/readability/ConstReturnTypeCheck.h
+/usr/include/clang-tidy/readability/ContainerSizeEmptyCheck.h
+/usr/include/clang-tidy/readability/ConvertMemberFunctionsToStatic.h
+/usr/include/clang-tidy/readability/DeleteNullPointerCheck.h
+/usr/include/clang-tidy/readability/DeletedDefaultCheck.h
+/usr/include/clang-tidy/readability/ElseAfterReturnCheck.h
+/usr/include/clang-tidy/readability/FunctionCognitiveComplexityCheck.h
+/usr/include/clang-tidy/readability/FunctionSizeCheck.h
+/usr/include/clang-tidy/readability/IdentifierNamingCheck.h
+/usr/include/clang-tidy/readability/ImplicitBoolConversionCheck.h
+/usr/include/clang-tidy/readability/InconsistentDeclarationParameterNameCheck.h
+/usr/include/clang-tidy/readability/IsolateDeclarationCheck.h
+/usr/include/clang-tidy/readability/MagicNumbersCheck.h
+/usr/include/clang-tidy/readability/MakeMemberFunctionConstCheck.h
+/usr/include/clang-tidy/readability/MisleadingIndentationCheck.h
+/usr/include/clang-tidy/readability/MisplacedArrayIndexCheck.h
+/usr/include/clang-tidy/readability/NamedParameterCheck.h
+/usr/include/clang-tidy/readability/NamespaceCommentCheck.h
+/usr/include/clang-tidy/readability/NonConstParameterCheck.h
+/usr/include/clang-tidy/readability/QualifiedAutoCheck.h
+/usr/include/clang-tidy/readability/RedundantAccessSpecifiersCheck.h
+/usr/include/clang-tidy/readability/RedundantControlFlowCheck.h
+/usr/include/clang-tidy/readability/RedundantDeclarationCheck.h
+/usr/include/clang-tidy/readability/RedundantFunctionPtrDereferenceCheck.h
+/usr/include/clang-tidy/readability/RedundantMemberInitCheck.h
+/usr/include/clang-tidy/readability/RedundantPreprocessorCheck.h
+/usr/include/clang-tidy/readability/RedundantSmartptrGetCheck.h
+/usr/include/clang-tidy/readability/RedundantStringCStrCheck.h
+/usr/include/clang-tidy/readability/RedundantStringInitCheck.h
+/usr/include/clang-tidy/readability/SimplifyBooleanExprCheck.h
+/usr/include/clang-tidy/readability/SimplifySubscriptExprCheck.h
+/usr/include/clang-tidy/readability/StaticAccessedThroughInstanceCheck.h
+/usr/include/clang-tidy/readability/StaticDefinitionInAnonymousNamespaceCheck.h
+/usr/include/clang-tidy/readability/StringCompareCheck.h
+/usr/include/clang-tidy/readability/UniqueptrDeleteReleaseCheck.h
+/usr/include/clang-tidy/readability/UppercaseLiteralSuffixCheck.h
+/usr/include/clang-tidy/readability/UseAnyOfAllOfCheck.h
+/usr/include/clang-tidy/tool/ClangTidyMain.h
+/usr/include/clang-tidy/utils/ASTUtils.h
+/usr/include/clang-tidy/utils/Aliasing.h
+/usr/include/clang-tidy/utils/DeclRefExprUtils.h
+/usr/include/clang-tidy/utils/ExceptionAnalyzer.h
+/usr/include/clang-tidy/utils/ExprSequence.h
+/usr/include/clang-tidy/utils/FileExtensionsUtils.h
+/usr/include/clang-tidy/utils/FixItHintUtils.h
+/usr/include/clang-tidy/utils/HeaderGuard.h
+/usr/include/clang-tidy/utils/IncludeInserter.h
+/usr/include/clang-tidy/utils/IncludeSorter.h
+/usr/include/clang-tidy/utils/LexerUtils.h
+/usr/include/clang-tidy/utils/Matchers.h
+/usr/include/clang-tidy/utils/NamespaceAliaser.h
+/usr/include/clang-tidy/utils/OptionsUtils.h
+/usr/include/clang-tidy/utils/RenamerClangTidyCheck.h
+/usr/include/clang-tidy/utils/TransformerClangTidyCheck.h
+/usr/include/clang-tidy/utils/TypeTraits.h
+/usr/include/clang-tidy/utils/UsingInserter.h
+/usr/include/clang-tidy/zircon/TemporaryObjectsCheck.h
 /usr/include/clang/APINotes/APINotesYAMLCompiler.h
 /usr/include/clang/APINotes/Types.h
 /usr/include/clang/ARCMigrate/ARCMT.h
@@ -1200,6 +1573,40 @@ popd
 /usr/include/clang/Tooling/Transformer/SourceCodeBuilders.h
 /usr/include/clang/Tooling/Transformer/Stencil.h
 /usr/include/clang/Tooling/Transformer/Transformer.h
+/usr/include/lld/Common/Args.h
+/usr/include/lld/Common/DWARF.h
+/usr/include/lld/Common/Driver.h
+/usr/include/lld/Common/ErrorHandler.h
+/usr/include/lld/Common/Filesystem.h
+/usr/include/lld/Common/LLVM.h
+/usr/include/lld/Common/Memory.h
+/usr/include/lld/Common/Reproduce.h
+/usr/include/lld/Common/Strings.h
+/usr/include/lld/Common/TargetOptionsCommandFlags.h
+/usr/include/lld/Common/Timer.h
+/usr/include/lld/Common/Version.h
+/usr/include/lld/Core/AbsoluteAtom.h
+/usr/include/lld/Core/ArchiveLibraryFile.h
+/usr/include/lld/Core/Atom.h
+/usr/include/lld/Core/DefinedAtom.h
+/usr/include/lld/Core/Error.h
+/usr/include/lld/Core/File.h
+/usr/include/lld/Core/Instrumentation.h
+/usr/include/lld/Core/LinkingContext.h
+/usr/include/lld/Core/Node.h
+/usr/include/lld/Core/Pass.h
+/usr/include/lld/Core/PassManager.h
+/usr/include/lld/Core/Reader.h
+/usr/include/lld/Core/Reference.h
+/usr/include/lld/Core/Resolver.h
+/usr/include/lld/Core/SharedLibraryAtom.h
+/usr/include/lld/Core/SharedLibraryFile.h
+/usr/include/lld/Core/Simple.h
+/usr/include/lld/Core/SymbolTable.h
+/usr/include/lld/Core/UndefinedAtom.h
+/usr/include/lld/Core/Writer.h
+/usr/include/lld/ReaderWriter/MachOLinkingContext.h
+/usr/include/lld/ReaderWriter/YamlContext.h
 /usr/include/llvm-c/Analysis.h
 /usr/include/llvm-c/BitReader.h
 /usr/include/llvm-c/BitWriter.h
@@ -2821,169 +3228,172 @@ popd
 /usr/include/llvm/XRay/YAMLXRayRecord.h
 /usr/lib/bfd-plugins/LLVMgold-12.so
 /usr/lib64/LLVMgold-12.so
-/usr/lib64/clang/12.0.0/include/__clang_cuda_builtin_vars.h
-/usr/lib64/clang/12.0.0/include/__clang_cuda_cmath.h
-/usr/lib64/clang/12.0.0/include/__clang_cuda_complex_builtins.h
-/usr/lib64/clang/12.0.0/include/__clang_cuda_device_functions.h
-/usr/lib64/clang/12.0.0/include/__clang_cuda_intrinsics.h
-/usr/lib64/clang/12.0.0/include/__clang_cuda_libdevice_declares.h
-/usr/lib64/clang/12.0.0/include/__clang_cuda_math.h
-/usr/lib64/clang/12.0.0/include/__clang_cuda_math_forward_declares.h
-/usr/lib64/clang/12.0.0/include/__clang_cuda_runtime_wrapper.h
-/usr/lib64/clang/12.0.0/include/__clang_hip_cmath.h
-/usr/lib64/clang/12.0.0/include/__clang_hip_libdevice_declares.h
-/usr/lib64/clang/12.0.0/include/__clang_hip_math.h
-/usr/lib64/clang/12.0.0/include/__clang_hip_runtime_wrapper.h
-/usr/lib64/clang/12.0.0/include/__stddef_max_align_t.h
-/usr/lib64/clang/12.0.0/include/__wmmintrin_aes.h
-/usr/lib64/clang/12.0.0/include/__wmmintrin_pclmul.h
-/usr/lib64/clang/12.0.0/include/adxintrin.h
-/usr/lib64/clang/12.0.0/include/altivec.h
-/usr/lib64/clang/12.0.0/include/ammintrin.h
-/usr/lib64/clang/12.0.0/include/amxintrin.h
-/usr/lib64/clang/12.0.0/include/arm64intr.h
-/usr/lib64/clang/12.0.0/include/arm_acle.h
-/usr/lib64/clang/12.0.0/include/arm_bf16.h
-/usr/lib64/clang/12.0.0/include/arm_cde.h
-/usr/lib64/clang/12.0.0/include/arm_cmse.h
-/usr/lib64/clang/12.0.0/include/arm_fp16.h
-/usr/lib64/clang/12.0.0/include/arm_mve.h
-/usr/lib64/clang/12.0.0/include/arm_neon.h
-/usr/lib64/clang/12.0.0/include/arm_sve.h
-/usr/lib64/clang/12.0.0/include/armintr.h
-/usr/lib64/clang/12.0.0/include/avx2intrin.h
-/usr/lib64/clang/12.0.0/include/avx512bf16intrin.h
-/usr/lib64/clang/12.0.0/include/avx512bitalgintrin.h
-/usr/lib64/clang/12.0.0/include/avx512bwintrin.h
-/usr/lib64/clang/12.0.0/include/avx512cdintrin.h
-/usr/lib64/clang/12.0.0/include/avx512dqintrin.h
-/usr/lib64/clang/12.0.0/include/avx512erintrin.h
-/usr/lib64/clang/12.0.0/include/avx512fintrin.h
-/usr/lib64/clang/12.0.0/include/avx512ifmaintrin.h
-/usr/lib64/clang/12.0.0/include/avx512ifmavlintrin.h
-/usr/lib64/clang/12.0.0/include/avx512pfintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vbmi2intrin.h
-/usr/lib64/clang/12.0.0/include/avx512vbmiintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vbmivlintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vlbf16intrin.h
-/usr/lib64/clang/12.0.0/include/avx512vlbitalgintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vlbwintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vlcdintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vldqintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vlintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vlvbmi2intrin.h
-/usr/lib64/clang/12.0.0/include/avx512vlvnniintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vlvp2intersectintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vnniintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vp2intersectintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vpopcntdqintrin.h
-/usr/lib64/clang/12.0.0/include/avx512vpopcntdqvlintrin.h
-/usr/lib64/clang/12.0.0/include/avxintrin.h
-/usr/lib64/clang/12.0.0/include/avxvnniintrin.h
-/usr/lib64/clang/12.0.0/include/bmi2intrin.h
-/usr/lib64/clang/12.0.0/include/bmiintrin.h
-/usr/lib64/clang/12.0.0/include/cet.h
-/usr/lib64/clang/12.0.0/include/cetintrin.h
-/usr/lib64/clang/12.0.0/include/cldemoteintrin.h
-/usr/lib64/clang/12.0.0/include/clflushoptintrin.h
-/usr/lib64/clang/12.0.0/include/clwbintrin.h
-/usr/lib64/clang/12.0.0/include/clzerointrin.h
-/usr/lib64/clang/12.0.0/include/cpuid.h
-/usr/lib64/clang/12.0.0/include/cuda_wrappers/algorithm
-/usr/lib64/clang/12.0.0/include/cuda_wrappers/complex
-/usr/lib64/clang/12.0.0/include/cuda_wrappers/new
-/usr/lib64/clang/12.0.0/include/emmintrin.h
-/usr/lib64/clang/12.0.0/include/enqcmdintrin.h
-/usr/lib64/clang/12.0.0/include/f16cintrin.h
-/usr/lib64/clang/12.0.0/include/float.h
-/usr/lib64/clang/12.0.0/include/fma4intrin.h
-/usr/lib64/clang/12.0.0/include/fmaintrin.h
-/usr/lib64/clang/12.0.0/include/fxsrintrin.h
-/usr/lib64/clang/12.0.0/include/gfniintrin.h
-/usr/lib64/clang/12.0.0/include/hresetintrin.h
-/usr/lib64/clang/12.0.0/include/htmintrin.h
-/usr/lib64/clang/12.0.0/include/htmxlintrin.h
-/usr/lib64/clang/12.0.0/include/ia32intrin.h
-/usr/lib64/clang/12.0.0/include/immintrin.h
-/usr/lib64/clang/12.0.0/include/intrin.h
-/usr/lib64/clang/12.0.0/include/inttypes.h
-/usr/lib64/clang/12.0.0/include/invpcidintrin.h
-/usr/lib64/clang/12.0.0/include/iso646.h
-/usr/lib64/clang/12.0.0/include/keylockerintrin.h
-/usr/lib64/clang/12.0.0/include/limits.h
-/usr/lib64/clang/12.0.0/include/lwpintrin.h
-/usr/lib64/clang/12.0.0/include/lzcntintrin.h
-/usr/lib64/clang/12.0.0/include/mm3dnow.h
-/usr/lib64/clang/12.0.0/include/mm_malloc.h
-/usr/lib64/clang/12.0.0/include/mmintrin.h
-/usr/lib64/clang/12.0.0/include/module.modulemap
-/usr/lib64/clang/12.0.0/include/movdirintrin.h
-/usr/lib64/clang/12.0.0/include/msa.h
-/usr/lib64/clang/12.0.0/include/mwaitxintrin.h
-/usr/lib64/clang/12.0.0/include/nmmintrin.h
-/usr/lib64/clang/12.0.0/include/opencl-c-base.h
-/usr/lib64/clang/12.0.0/include/opencl-c.h
-/usr/lib64/clang/12.0.0/include/openmp_wrappers/__clang_openmp_device_functions.h
-/usr/lib64/clang/12.0.0/include/openmp_wrappers/cmath
-/usr/lib64/clang/12.0.0/include/openmp_wrappers/complex
-/usr/lib64/clang/12.0.0/include/openmp_wrappers/complex.h
-/usr/lib64/clang/12.0.0/include/openmp_wrappers/complex_cmath.h
-/usr/lib64/clang/12.0.0/include/openmp_wrappers/math.h
-/usr/lib64/clang/12.0.0/include/openmp_wrappers/new
-/usr/lib64/clang/12.0.0/include/pconfigintrin.h
-/usr/lib64/clang/12.0.0/include/pkuintrin.h
-/usr/lib64/clang/12.0.0/include/pmmintrin.h
-/usr/lib64/clang/12.0.0/include/popcntintrin.h
-/usr/lib64/clang/12.0.0/include/ppc_wrappers/emmintrin.h
-/usr/lib64/clang/12.0.0/include/ppc_wrappers/mm_malloc.h
-/usr/lib64/clang/12.0.0/include/ppc_wrappers/mmintrin.h
-/usr/lib64/clang/12.0.0/include/ppc_wrappers/pmmintrin.h
-/usr/lib64/clang/12.0.0/include/ppc_wrappers/smmintrin.h
-/usr/lib64/clang/12.0.0/include/ppc_wrappers/tmmintrin.h
-/usr/lib64/clang/12.0.0/include/ppc_wrappers/xmmintrin.h
-/usr/lib64/clang/12.0.0/include/prfchwintrin.h
-/usr/lib64/clang/12.0.0/include/ptwriteintrin.h
-/usr/lib64/clang/12.0.0/include/rdseedintrin.h
-/usr/lib64/clang/12.0.0/include/rtmintrin.h
-/usr/lib64/clang/12.0.0/include/s390intrin.h
-/usr/lib64/clang/12.0.0/include/serializeintrin.h
-/usr/lib64/clang/12.0.0/include/sgxintrin.h
-/usr/lib64/clang/12.0.0/include/shaintrin.h
-/usr/lib64/clang/12.0.0/include/smmintrin.h
-/usr/lib64/clang/12.0.0/include/stdalign.h
-/usr/lib64/clang/12.0.0/include/stdarg.h
-/usr/lib64/clang/12.0.0/include/stdatomic.h
-/usr/lib64/clang/12.0.0/include/stdbool.h
-/usr/lib64/clang/12.0.0/include/stddef.h
-/usr/lib64/clang/12.0.0/include/stdint.h
-/usr/lib64/clang/12.0.0/include/stdnoreturn.h
-/usr/lib64/clang/12.0.0/include/tbmintrin.h
-/usr/lib64/clang/12.0.0/include/tgmath.h
-/usr/lib64/clang/12.0.0/include/tmmintrin.h
-/usr/lib64/clang/12.0.0/include/tsxldtrkintrin.h
-/usr/lib64/clang/12.0.0/include/uintrintrin.h
-/usr/lib64/clang/12.0.0/include/unwind.h
-/usr/lib64/clang/12.0.0/include/vadefs.h
-/usr/lib64/clang/12.0.0/include/vaesintrin.h
-/usr/lib64/clang/12.0.0/include/varargs.h
-/usr/lib64/clang/12.0.0/include/vecintrin.h
-/usr/lib64/clang/12.0.0/include/vpclmulqdqintrin.h
-/usr/lib64/clang/12.0.0/include/waitpkgintrin.h
-/usr/lib64/clang/12.0.0/include/wasm_simd128.h
-/usr/lib64/clang/12.0.0/include/wbnoinvdintrin.h
-/usr/lib64/clang/12.0.0/include/wmmintrin.h
-/usr/lib64/clang/12.0.0/include/x86gprintrin.h
-/usr/lib64/clang/12.0.0/include/x86intrin.h
-/usr/lib64/clang/12.0.0/include/xmmintrin.h
-/usr/lib64/clang/12.0.0/include/xopintrin.h
-/usr/lib64/clang/12.0.0/include/xsavecintrin.h
-/usr/lib64/clang/12.0.0/include/xsaveintrin.h
-/usr/lib64/clang/12.0.0/include/xsaveoptintrin.h
-/usr/lib64/clang/12.0.0/include/xsavesintrin.h
-/usr/lib64/clang/12.0.0/include/xtestintrin.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_builtin_vars.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_cmath.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_complex_builtins.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_device_functions.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_intrinsics.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_libdevice_declares.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_math.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_math_forward_declares.h
+/usr/lib64/clang/12.0.1/include/__clang_cuda_runtime_wrapper.h
+/usr/lib64/clang/12.0.1/include/__clang_hip_cmath.h
+/usr/lib64/clang/12.0.1/include/__clang_hip_libdevice_declares.h
+/usr/lib64/clang/12.0.1/include/__clang_hip_math.h
+/usr/lib64/clang/12.0.1/include/__clang_hip_runtime_wrapper.h
+/usr/lib64/clang/12.0.1/include/__stddef_max_align_t.h
+/usr/lib64/clang/12.0.1/include/__wmmintrin_aes.h
+/usr/lib64/clang/12.0.1/include/__wmmintrin_pclmul.h
+/usr/lib64/clang/12.0.1/include/adxintrin.h
+/usr/lib64/clang/12.0.1/include/altivec.h
+/usr/lib64/clang/12.0.1/include/ammintrin.h
+/usr/lib64/clang/12.0.1/include/amxintrin.h
+/usr/lib64/clang/12.0.1/include/arm64intr.h
+/usr/lib64/clang/12.0.1/include/arm_acle.h
+/usr/lib64/clang/12.0.1/include/arm_bf16.h
+/usr/lib64/clang/12.0.1/include/arm_cde.h
+/usr/lib64/clang/12.0.1/include/arm_cmse.h
+/usr/lib64/clang/12.0.1/include/arm_fp16.h
+/usr/lib64/clang/12.0.1/include/arm_mve.h
+/usr/lib64/clang/12.0.1/include/arm_neon.h
+/usr/lib64/clang/12.0.1/include/arm_sve.h
+/usr/lib64/clang/12.0.1/include/armintr.h
+/usr/lib64/clang/12.0.1/include/avx2intrin.h
+/usr/lib64/clang/12.0.1/include/avx512bf16intrin.h
+/usr/lib64/clang/12.0.1/include/avx512bitalgintrin.h
+/usr/lib64/clang/12.0.1/include/avx512bwintrin.h
+/usr/lib64/clang/12.0.1/include/avx512cdintrin.h
+/usr/lib64/clang/12.0.1/include/avx512dqintrin.h
+/usr/lib64/clang/12.0.1/include/avx512erintrin.h
+/usr/lib64/clang/12.0.1/include/avx512fintrin.h
+/usr/lib64/clang/12.0.1/include/avx512ifmaintrin.h
+/usr/lib64/clang/12.0.1/include/avx512ifmavlintrin.h
+/usr/lib64/clang/12.0.1/include/avx512pfintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vbmi2intrin.h
+/usr/lib64/clang/12.0.1/include/avx512vbmiintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vbmivlintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vlbf16intrin.h
+/usr/lib64/clang/12.0.1/include/avx512vlbitalgintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vlbwintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vlcdintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vldqintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vlintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vlvbmi2intrin.h
+/usr/lib64/clang/12.0.1/include/avx512vlvnniintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vlvp2intersectintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vnniintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vp2intersectintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vpopcntdqintrin.h
+/usr/lib64/clang/12.0.1/include/avx512vpopcntdqvlintrin.h
+/usr/lib64/clang/12.0.1/include/avxintrin.h
+/usr/lib64/clang/12.0.1/include/avxvnniintrin.h
+/usr/lib64/clang/12.0.1/include/bmi2intrin.h
+/usr/lib64/clang/12.0.1/include/bmiintrin.h
+/usr/lib64/clang/12.0.1/include/cet.h
+/usr/lib64/clang/12.0.1/include/cetintrin.h
+/usr/lib64/clang/12.0.1/include/cldemoteintrin.h
+/usr/lib64/clang/12.0.1/include/clflushoptintrin.h
+/usr/lib64/clang/12.0.1/include/clwbintrin.h
+/usr/lib64/clang/12.0.1/include/clzerointrin.h
+/usr/lib64/clang/12.0.1/include/cpuid.h
+/usr/lib64/clang/12.0.1/include/cuda_wrappers/algorithm
+/usr/lib64/clang/12.0.1/include/cuda_wrappers/complex
+/usr/lib64/clang/12.0.1/include/cuda_wrappers/new
+/usr/lib64/clang/12.0.1/include/emmintrin.h
+/usr/lib64/clang/12.0.1/include/enqcmdintrin.h
+/usr/lib64/clang/12.0.1/include/f16cintrin.h
+/usr/lib64/clang/12.0.1/include/float.h
+/usr/lib64/clang/12.0.1/include/fma4intrin.h
+/usr/lib64/clang/12.0.1/include/fmaintrin.h
+/usr/lib64/clang/12.0.1/include/fxsrintrin.h
+/usr/lib64/clang/12.0.1/include/gfniintrin.h
+/usr/lib64/clang/12.0.1/include/hresetintrin.h
+/usr/lib64/clang/12.0.1/include/htmintrin.h
+/usr/lib64/clang/12.0.1/include/htmxlintrin.h
+/usr/lib64/clang/12.0.1/include/ia32intrin.h
+/usr/lib64/clang/12.0.1/include/immintrin.h
+/usr/lib64/clang/12.0.1/include/intrin.h
+/usr/lib64/clang/12.0.1/include/inttypes.h
+/usr/lib64/clang/12.0.1/include/invpcidintrin.h
+/usr/lib64/clang/12.0.1/include/iso646.h
+/usr/lib64/clang/12.0.1/include/keylockerintrin.h
+/usr/lib64/clang/12.0.1/include/limits.h
+/usr/lib64/clang/12.0.1/include/lwpintrin.h
+/usr/lib64/clang/12.0.1/include/lzcntintrin.h
+/usr/lib64/clang/12.0.1/include/mm3dnow.h
+/usr/lib64/clang/12.0.1/include/mm_malloc.h
+/usr/lib64/clang/12.0.1/include/mmintrin.h
+/usr/lib64/clang/12.0.1/include/module.modulemap
+/usr/lib64/clang/12.0.1/include/movdirintrin.h
+/usr/lib64/clang/12.0.1/include/msa.h
+/usr/lib64/clang/12.0.1/include/mwaitxintrin.h
+/usr/lib64/clang/12.0.1/include/nmmintrin.h
+/usr/lib64/clang/12.0.1/include/opencl-c-base.h
+/usr/lib64/clang/12.0.1/include/opencl-c.h
+/usr/lib64/clang/12.0.1/include/openmp_wrappers/__clang_openmp_device_functions.h
+/usr/lib64/clang/12.0.1/include/openmp_wrappers/cmath
+/usr/lib64/clang/12.0.1/include/openmp_wrappers/complex
+/usr/lib64/clang/12.0.1/include/openmp_wrappers/complex.h
+/usr/lib64/clang/12.0.1/include/openmp_wrappers/complex_cmath.h
+/usr/lib64/clang/12.0.1/include/openmp_wrappers/math.h
+/usr/lib64/clang/12.0.1/include/openmp_wrappers/new
+/usr/lib64/clang/12.0.1/include/pconfigintrin.h
+/usr/lib64/clang/12.0.1/include/pkuintrin.h
+/usr/lib64/clang/12.0.1/include/pmmintrin.h
+/usr/lib64/clang/12.0.1/include/popcntintrin.h
+/usr/lib64/clang/12.0.1/include/ppc_wrappers/emmintrin.h
+/usr/lib64/clang/12.0.1/include/ppc_wrappers/mm_malloc.h
+/usr/lib64/clang/12.0.1/include/ppc_wrappers/mmintrin.h
+/usr/lib64/clang/12.0.1/include/ppc_wrappers/pmmintrin.h
+/usr/lib64/clang/12.0.1/include/ppc_wrappers/smmintrin.h
+/usr/lib64/clang/12.0.1/include/ppc_wrappers/tmmintrin.h
+/usr/lib64/clang/12.0.1/include/ppc_wrappers/xmmintrin.h
+/usr/lib64/clang/12.0.1/include/prfchwintrin.h
+/usr/lib64/clang/12.0.1/include/ptwriteintrin.h
+/usr/lib64/clang/12.0.1/include/rdseedintrin.h
+/usr/lib64/clang/12.0.1/include/rtmintrin.h
+/usr/lib64/clang/12.0.1/include/s390intrin.h
+/usr/lib64/clang/12.0.1/include/serializeintrin.h
+/usr/lib64/clang/12.0.1/include/sgxintrin.h
+/usr/lib64/clang/12.0.1/include/shaintrin.h
+/usr/lib64/clang/12.0.1/include/smmintrin.h
+/usr/lib64/clang/12.0.1/include/stdalign.h
+/usr/lib64/clang/12.0.1/include/stdarg.h
+/usr/lib64/clang/12.0.1/include/stdatomic.h
+/usr/lib64/clang/12.0.1/include/stdbool.h
+/usr/lib64/clang/12.0.1/include/stddef.h
+/usr/lib64/clang/12.0.1/include/stdint.h
+/usr/lib64/clang/12.0.1/include/stdnoreturn.h
+/usr/lib64/clang/12.0.1/include/tbmintrin.h
+/usr/lib64/clang/12.0.1/include/tgmath.h
+/usr/lib64/clang/12.0.1/include/tmmintrin.h
+/usr/lib64/clang/12.0.1/include/tsxldtrkintrin.h
+/usr/lib64/clang/12.0.1/include/uintrintrin.h
+/usr/lib64/clang/12.0.1/include/unwind.h
+/usr/lib64/clang/12.0.1/include/vadefs.h
+/usr/lib64/clang/12.0.1/include/vaesintrin.h
+/usr/lib64/clang/12.0.1/include/varargs.h
+/usr/lib64/clang/12.0.1/include/vecintrin.h
+/usr/lib64/clang/12.0.1/include/vpclmulqdqintrin.h
+/usr/lib64/clang/12.0.1/include/waitpkgintrin.h
+/usr/lib64/clang/12.0.1/include/wasm_simd128.h
+/usr/lib64/clang/12.0.1/include/wbnoinvdintrin.h
+/usr/lib64/clang/12.0.1/include/wmmintrin.h
+/usr/lib64/clang/12.0.1/include/x86gprintrin.h
+/usr/lib64/clang/12.0.1/include/x86intrin.h
+/usr/lib64/clang/12.0.1/include/xmmintrin.h
+/usr/lib64/clang/12.0.1/include/xopintrin.h
+/usr/lib64/clang/12.0.1/include/xsavecintrin.h
+/usr/lib64/clang/12.0.1/include/xsaveintrin.h
+/usr/lib64/clang/12.0.1/include/xsaveoptintrin.h
+/usr/lib64/clang/12.0.1/include/xsavesintrin.h
+/usr/lib64/clang/12.0.1/include/xtestintrin.h
 /usr/lib64/cmake/clang/ClangConfig.cmake
 /usr/lib64/cmake/clang/ClangTargets-release.cmake
 /usr/lib64/cmake/clang/ClangTargets.cmake
+/usr/lib64/cmake/lld/LLDConfig.cmake
+/usr/lib64/cmake/lld/LLDTargets-release.cmake
+/usr/lib64/cmake/lld/LLDTargets.cmake
 /usr/lib64/cmake/llvm/AddLLVM.cmake
 /usr/lib64/cmake/llvm/AddLLVMDefinitions.cmake
 /usr/lib64/cmake/llvm/AddOCaml.cmake
@@ -3018,7 +3428,7 @@ popd
 /usr/lib64/cmake/llvm/TensorFlowCompile.cmake
 /usr/lib64/cmake/llvm/UseLibtool.cmake
 /usr/lib64/cmake/llvm/VersionFromVCS.cmake
-/usr/lib64/libLLVM-12.0.0.so
+/usr/lib64/libLLVM-12.0.1.so
 /usr/lib64/libLLVM-12.so
 /usr/lib64/libLLVM.so
 /usr/lib64/libLTO.so
@@ -3032,6 +3442,15 @@ popd
 /usr/lib64/libRemarks.so.12
 /usr/lib64/libclang-cpp.so.12
 /usr/lib64/libclang.so.12
+
+%files libexec
+%defattr(-,root,root,-)
+/usr/libexec/c++-analyzer
+/usr/libexec/ccc-analyzer
+
+%files man
+%defattr(0644,root,root,0755)
+/usr/share/man/man1/scan-build.1
 
 %files staticdev
 %defattr(-,root,root,-)
@@ -3113,11 +3532,16 @@ popd
 /usr/lib64/libclangAST.a
 /usr/lib64/libclangASTMatchers.a
 /usr/lib64/libclangAnalysis.a
+/usr/lib64/libclangApplyReplacements.a
 /usr/lib64/libclangBasic.a
+/usr/lib64/libclangChangeNamespace.a
 /usr/lib64/libclangCodeGen.a
 /usr/lib64/libclangCrossTU.a
+/usr/lib64/libclangDaemon.a
+/usr/lib64/libclangDaemonTweaks.a
 /usr/lib64/libclangDependencyScanning.a
 /usr/lib64/libclangDirectoryWatcher.a
+/usr/lib64/libclangDoc.a
 /usr/lib64/libclangDriver.a
 /usr/lib64/libclangDynamicASTMatchers.a
 /usr/lib64/libclangEdit.a
@@ -3126,10 +3550,15 @@ popd
 /usr/lib64/libclangFrontendTool.a
 /usr/lib64/libclangHandleCXX.a
 /usr/lib64/libclangHandleLLVM.a
+/usr/lib64/libclangIncludeFixer.a
+/usr/lib64/libclangIncludeFixerPlugin.a
 /usr/lib64/libclangIndex.a
 /usr/lib64/libclangIndexSerialization.a
 /usr/lib64/libclangLex.a
+/usr/lib64/libclangMove.a
 /usr/lib64/libclangParse.a
+/usr/lib64/libclangQuery.a
+/usr/lib64/libclangReorderFields.a
 /usr/lib64/libclangRewrite.a
 /usr/lib64/libclangRewriteFrontend.a
 /usr/lib64/libclangSema.a
@@ -3138,6 +3567,34 @@ popd
 /usr/lib64/libclangStaticAnalyzerCore.a
 /usr/lib64/libclangStaticAnalyzerFrontend.a
 /usr/lib64/libclangTesting.a
+/usr/lib64/libclangTidy.a
+/usr/lib64/libclangTidyAbseilModule.a
+/usr/lib64/libclangTidyAlteraModule.a
+/usr/lib64/libclangTidyAndroidModule.a
+/usr/lib64/libclangTidyBoostModule.a
+/usr/lib64/libclangTidyBugproneModule.a
+/usr/lib64/libclangTidyCERTModule.a
+/usr/lib64/libclangTidyConcurrencyModule.a
+/usr/lib64/libclangTidyCppCoreGuidelinesModule.a
+/usr/lib64/libclangTidyDarwinModule.a
+/usr/lib64/libclangTidyFuchsiaModule.a
+/usr/lib64/libclangTidyGoogleModule.a
+/usr/lib64/libclangTidyHICPPModule.a
+/usr/lib64/libclangTidyLLVMLibcModule.a
+/usr/lib64/libclangTidyLLVMModule.a
+/usr/lib64/libclangTidyLinuxKernelModule.a
+/usr/lib64/libclangTidyMPIModule.a
+/usr/lib64/libclangTidyMain.a
+/usr/lib64/libclangTidyMiscModule.a
+/usr/lib64/libclangTidyModernizeModule.a
+/usr/lib64/libclangTidyObjCModule.a
+/usr/lib64/libclangTidyOpenMPModule.a
+/usr/lib64/libclangTidyPerformanceModule.a
+/usr/lib64/libclangTidyPlugin.a
+/usr/lib64/libclangTidyPortabilityModule.a
+/usr/lib64/libclangTidyReadabilityModule.a
+/usr/lib64/libclangTidyUtils.a
+/usr/lib64/libclangTidyZirconModule.a
 /usr/lib64/libclangTooling.a
 /usr/lib64/libclangToolingASTDiff.a
 /usr/lib64/libclangToolingCore.a
@@ -3145,3 +3602,17 @@ popd
 /usr/lib64/libclangToolingRefactoring.a
 /usr/lib64/libclangToolingSyntax.a
 /usr/lib64/libclangTransformer.a
+/usr/lib64/libclangdRemoteIndex.a
+/usr/lib64/libclangdSupport.a
+/usr/lib64/libfindAllSymbols.a
+/usr/lib64/liblldCOFF.a
+/usr/lib64/liblldCommon.a
+/usr/lib64/liblldCore.a
+/usr/lib64/liblldDriver.a
+/usr/lib64/liblldELF.a
+/usr/lib64/liblldMachO.a
+/usr/lib64/liblldMachO2.a
+/usr/lib64/liblldMinGW.a
+/usr/lib64/liblldReaderWriter.a
+/usr/lib64/liblldWasm.a
+/usr/lib64/liblldYAML.a

@@ -64,7 +64,6 @@ ncurses-lib
 ncurses-lib32
 ncurses-lib-narrow
 ncurses-lib-plusplus
-ncurses-man
 #ncurses-staticdev
 #ncurses-staticdev32
 ninja
