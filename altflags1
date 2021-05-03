@@ -17,7 +17,7 @@ unset FFLAGS
 export AR=/usr/bin/gcc-ar
 export RANLIB=/usr/bin/gcc-ranlib
 export NM=/usr/bin/gcc-nm
-#  -Wl,--no-as-needed -pthread -lpthread --no-gc-sections -ffunction-sections -fdata-sections
-export CFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition"
-export CXXFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition"
-export LDFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -Wl,--no-as-needed -pthread -lpthread -fno-semantic-interposition"
+#  --no-gc-sections -ffunction-sections -fdata-sections  -Wl,--no-as-needed -pthread -lpthread clang-tools-extra
+export CFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -malign-data=cacheline -Wl,-sort-common -fdevirtualize-at-ltrans -flifetime-dse=1 -Wl,--as-needed -static-libgcc -static-libstdc++ -fPIC -pipe"
+export CXXFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -malign-data=cacheline -Wl,-sort-common -fdevirtualize-at-ltrans -flifetime-dse=1 -Wl,--as-needed -static-libgcc -static-libstdc++ -fPIC -pipe"
+export LDFLAGS="-O3 -flto=16 -ffat-lto-objects -fuse-ld=bfd -fuse-linker-plugin -march=native -mtune=native -Wall -Wl,-O2 -Wl,--build-id=sha1 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -malign-data=cacheline -Wl,-sort-common -fdevirtualize-at-ltrans -flifetime-dse=1 -Wl,--as-needed -static-libgcc -static-libstdc++ -fPIC -pipe"
