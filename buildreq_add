@@ -64,8 +64,6 @@ ncurses-lib
 ncurses-lib32
 ncurses-lib-narrow
 ncurses-lib-plusplus
-#ncurses-staticdev
-#ncurses-staticdev32
 ninja
 procps-ng
 Pygments
