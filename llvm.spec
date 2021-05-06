@@ -205,7 +205,7 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1620268921
+export SOURCE_DATE_EPOCH=1620284234
 unset LD_AS_NEEDED
 mkdir -p clr-build
 pushd clr-build
@@ -325,7 +325,7 @@ ccache -s
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1620268921
+export SOURCE_DATE_EPOCH=1620284234
 rm -rf %{buildroot}
 pushd clr-build
 %ninja_install
@@ -356,6 +356,7 @@ popd
 # Ditto for the gold plugin
 pushd %{buildroot}/usr/lib64
 mv LLVMgold.so LLVMgold-$VERSION.so
+ln -s LLVMgold-$VERSION.so LLVMgold.so
 mkdir -p ../lib/bfd-plugins
 ln -s ../../lib64/LLVMgold-$VERSION.so ../lib/bfd-plugins
 popd
@@ -3351,6 +3352,7 @@ popd
 /usr/lib/bfd-plugins/LLVMgold-12.so
 /usr/lib64/LLVMPolly.so
 /usr/lib64/LLVMgold-12.so
+/usr/lib64/LLVMgold.so
 /usr/lib64/clang/12.0.1/include/__clang_cuda_builtin_vars.h
 /usr/lib64/clang/12.0.1/include/__clang_cuda_cmath.h
 /usr/lib64/clang/12.0.1/include/__clang_cuda_complex_builtins.h
