@@ -50,9 +50,13 @@ libstdc++
 libunwind-dev
 libxml2-dev
 libxml2-staticdev
+libxml2-dev32
+libxml2-staticdev32
 libxslt
 mpc-dev
 mpfr-dev
+mpc-dev32
+mpfr-dev32
 ncurses
 ncurses-abi
 ncurses-bin
